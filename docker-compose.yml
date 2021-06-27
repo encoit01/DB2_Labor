@@ -1,0 +1,45 @@
+version: '3'
+services:
+  mssqlserver:
+    container_name: mssqlserver
+    image: mssqlserver
+    build:
+      context: ./docker/mssql
+      dockerfile: ./Dockerfile
+    ports:
+      - 1433:1433
+    networks:
+      - db2Project
+    volumes:
+      - ./docker/mssql/.data:/var/opt/mssql/data
+
+  php:
+    container_name: db2_labor_ss21_encoit01-php
+    build:
+      context: docker/php
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - ./src:/var/www
+    links:
+      - mssqlserver
+    networks:
+      - db2Project
+
+  nginx:
+    container_name: db2_labor_ss21_encoit01-nginx
+    build:
+      context: docker/nginx
+    restart: unless-stopped
+    ports:
+      - "${WEB_PORT}:80"
+    volumes:
+      - ./src:/var/www
+    links:
+      - php
+    networks:
+      - db2Project
+
+networks:
+  db2Project:
+    driver: bridge
