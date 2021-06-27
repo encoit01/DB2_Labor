@@ -8,7 +8,9 @@ function handler($error, $msg, $zahl) {
     if($error == true) {
         ?>
         <div class="errorBox">
-            <?php echo($msg) ?>
+            <?php
+            //Display the given error
+            echo($msg) ?>
         </div>
         <?php
     }

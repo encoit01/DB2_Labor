@@ -20,12 +20,12 @@ if (isset($_POST["username"]) && isset($_POST["password"])) {
                 $result = $build->fetch(PDO::FETCH_ASSOC);
 
                 if($result['counter'] == 0) {
-                    //Add user
+                    //Add with addUser-Procedure of SQL-Script
                     $sql = "EXEC addUser @username=:username, @password=:password";
                     $build = $connection->prepare($sql);
                     $build->execute(array(':username' => $_POST["username"], ':password' =>  password_hash($_POST["password"], PASSWORD_BCRYPT)));
                     if($build) {
-                        //Get user
+                        //Get user with getUser-Procedure of SQL-Script
                         $sql = "EXEC getUser @username=:username";
                         $build = $connection->prepare($sql);
                         $build->execute(array(':username' => $_POST["username"]));
@@ -74,6 +74,7 @@ include ("../helpers/errorHandler.php")
         </form>
     </div>
     <?php
+    //Call errorHandler for all possible errors
     handler($error, $message, 2);
     ?>
 </body>

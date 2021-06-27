@@ -6,7 +6,7 @@ $error = false;
 $message = "";
 $connection = dbConnection();
 
-
+//Handle the login
 if(isset($_POST["username"]) && isset($_POST["password"])) {
     try {
         if ($_POST["username"] != "" && $_POST["password"] != "") {
@@ -14,6 +14,7 @@ if(isset($_POST["username"]) && isset($_POST["password"])) {
             $build = $connection->prepare($sql);
             $build->execute(array('username' => $_POST["username"]));
             $res = $build->fetch();
+            //Check if logIn is valid
             if (password_verify($_POST["password"], $res['passwort'])) {
                 $_SESSION['username'] = $res['username'];
                 $_SESSION['userId'] = $res['userId'];
@@ -56,6 +57,7 @@ include("./helpers/includes.php");
     </form>
 </div>
 <?php
+//Call errorHandler for all possible errors
 handler($error, $message, 1);
 ?>
 </body>

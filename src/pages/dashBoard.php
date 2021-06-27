@@ -9,15 +9,16 @@ $result = [];
 $connection = dbConnection();
 $avg = 0;
 
-
-
+//Delete the selected grade in the db
 if(isset($_POST['delete'])) {
     global $connection;
+    //Call deleteGrade-Procedure in SQL-Script
     $sql = "EXEC deleteGrade @id=:id";
     $build = $connection->prepare($sql);
     $build->execute(array(':id' =>  $_POST['delete']));
 }
 
+//Open the update window
 if(isset($_POST['update']) && !isset($_POST["updatedGrade"])) {
     try{
     $_SESSION["gradeIndex"] = $_POST['update'];
@@ -39,11 +40,13 @@ if(isset($_POST['update']) && !isset($_POST["updatedGrade"])) {
     }
 }
 
+//Update the given new grade in the database
 if(isset($_POST["updatedGrade"])) {
     Try {
         global $connection, $result;
         $res = $_SESSION['allGrades'];
         $req = $res[$_SESSION['gradeIndex']];
+        //Call addGrade-Procedure in SQL-Script
         $sql = "EXEC addGrade @note=:note, @fach=:fach, @userId=:userId, @credits=:credits";
         $build = $connection->prepare($sql);
         $build->execute(array(
@@ -58,10 +61,11 @@ if(isset($_POST["updatedGrade"])) {
     }
 }
 
+//Get all grades from a user
 function getGrades() {
     try {
-        //Get grade
         global $result, $connection, $error, $message;
+        //Call getGrades-Procedure in SQL-Script
         $sql = "EXECUTE getGrades @userId=:userId";
         $build = $connection->prepare($sql);
         $build->execute(array(':userId' => intval($_SESSION["userId"])));
@@ -83,10 +87,11 @@ function getGrades() {
     }
 }
 
-
+//Calculate the avg grade and save it in the db
 function getAvg() {
     try {
         global $connection, $avg, $error, $message;
+        //Call getAvg-Procedure in SQL-Script
         $sql = "EXECUTE getAvg @userId=:userId";
         $build = $connection->prepare($sql);
         $build->execute(array(':userId' => intval($_SESSION["userId"])));
@@ -98,6 +103,7 @@ function getAvg() {
     }
 }
 
+//Add a new grade and save it in the db
 if(isset($_POST['fach']) && isset($_POST['note']) && isset($_POST['credits'])) {
     try {
         $data = array(
@@ -106,7 +112,7 @@ if(isset($_POST['fach']) && isset($_POST['note']) && isset($_POST['credits'])) {
             'credits' => intval($_POST["credits"]),
             'userId' => intval($_SESSION["userId"])
         );
-        //Set grade
+        //Call addGrade-Procedure in SQL-Script
         $sql = "EXEC addGrade @note=:note, @fach=:fach, @userId=:userId, @credits=:credits";
         $build = $connection->prepare($sql);
         $build->execute($data);
@@ -117,7 +123,7 @@ if(isset($_POST['fach']) && isset($_POST['note']) && isset($_POST['credits'])) {
     }
 }
 
-
+//Logout to the login window
 if (isset($_POST["logOut"])) {
     header("location: ../index.php");
 }
@@ -134,10 +140,10 @@ include("../helpers/includes.php");
         </form>
     </div>
     <div class="logOut">
-        <?php include("./logOut.php"); ?>
     </div>
     <div class="durch">
         <strong style="color: white;"> <?php
+        //Calculate the avg grade after every action and display it
         getAvg();
         echo($avg)
         ?></strong>
@@ -173,6 +179,7 @@ include("../helpers/includes.php");
         </div>
     </div>
     <?php
+    //Get the newest grades and display them
     getGrades();
     foreach ($result as $key => $item) { ?>
     <div class="display">
@@ -200,6 +207,7 @@ include("../helpers/includes.php");
         </form>
     </div>
     <?php }
+    //Include the errorHandlr for all possible errors
     include("../helpers/errorHandler.php");
     handler($error, $message, 2);
     ?>
